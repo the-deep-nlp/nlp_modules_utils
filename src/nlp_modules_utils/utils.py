@@ -8,6 +8,7 @@ from botocore.client import Config
 from botocore.exceptions import ClientError
 from datetime import datetime
 from typing import Dict, Any
+from enum import Enum
 
 logger = logging.getLogger('__name__')
 logger.setLevel(logging.INFO)
@@ -171,6 +172,15 @@ def update_db_table_callback_retry(
     else:
         logger.error(f"Failed to update table {db_table} for callback retries. Some missing fields")
 
+
+class StateHandler(Enum):
+    """
+    List of categories to indicate the status of task
+    """
+    INITIATED = 1
+    SUCCESS = 2
+    FAILED = 3
+    INPUT_URL_PROCESS_FAILED = 4
 
 class Database:
     """
