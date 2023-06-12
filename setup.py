@@ -11,7 +11,8 @@ setup(
     # Dependencies
     install_requires=[
         "psycopg2-binary==2.9.6",
-        "boto3==1.26.151"
+        "boto3==1.26.151",
+        "requests==2.31.0"
     ],
     entry_points={
     },
