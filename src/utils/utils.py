@@ -13,28 +13,27 @@ logger = logging.getLogger('__name__')
 logger.setLevel(logging.INFO)
 
 def prepare_sql_statement_success(
-    unique_id,
-    db_table,
-    status,
-    response_object
+    unique_id: str,
+    db_table: str,
+    status: int,
+    response_object: Any
 ):
     return f"""
         UPDATE {db_table} SET status='{status}', result_data='{response_object} WHERE unique_id='{unique_id}'
     """
 
 def prepare_sql_statement_failure(
-    unique_id,
-    db_table,
-    status,
-    response_object
+    unique_id: str,
+    db_table: str,
+    status: int
 ):
     return f"""
         UPDATE {db_table} SET status='{status}' WHERE unique_id='{unique_id}'
     """
 
 def prepare_sql_statement_callback_failure(
-    unique_id,
-    db_table
+    unique_id: str,
+    db_table: str
 ):
     # note: status = 3 (Retrying)
     now_date = datetime.now().isoformat()
