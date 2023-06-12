@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="core_server_modules_utils",
+    name="nlp_modules_utils",
     author="rsh",
     author_email="",
     description="Helper utils functions",
