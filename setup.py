@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="core-server-modules-utils",
+    name="core_server_modules_utils",
     author="rsh",
     author_email="",
     description="Helper utils functions",
