@@ -6,8 +6,8 @@ import boto3
 import requests
 from botocore.client import Config
 from botocore.exceptions import ClientError
-from datetime import date, datetime
-from typing import Any
+from datetime import datetime
+from typing import Dict, Any
 
 logger = logging.getLogger('__name__')
 logger.setLevel(logging.INFO)
@@ -16,10 +16,10 @@ def prepare_sql_statement_success(
     unique_id: str,
     db_table: str,
     status: int,
-    response_object: Any
+    response_data: Any
 ):
     return f"""
-        UPDATE {db_table} SET status='{status}', result_data='{response_object} WHERE unique_id='{unique_id}'
+        UPDATE {db_table} SET status='{status}', result_data='{json.dumps(response_data)}' WHERE unique_id='{unique_id}'
     """
 
 def prepare_sql_statement_failure(
@@ -126,10 +126,8 @@ def upload_to_s3(
         return None
 
 def send_request_on_callback(
-    client_id: str,
     callback_url: str,
-    presigned_url: str,
-    status: int,
+    response_data: Dict,
     headers: str,
 ):
     """
@@ -139,11 +137,7 @@ def send_request_on_callback(
         response = requests.post(
             callback_url,
             headers=headers,
-            data=json.dumps({
-                "client_id": client_id,
-                "presigned_s3_url": presigned_url,
-                "status": status
-            }),
+            data=json.dumps(response_data),
             timeout=30
         )
     except requests.exceptions.RequestException as rexc:
