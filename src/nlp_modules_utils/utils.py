@@ -7,7 +7,7 @@ import requests
 from botocore.client import Config
 from botocore.exceptions import ClientError
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from enum import Enum
 
 logger = logging.getLogger('__name__')
@@ -67,22 +67,24 @@ def status_update_db(
 def generate_presigned_url(
     bucket_name:str,
     key:str,
-    aws_region: str="us-east-1",
-    signed_url_expiry_secs: int=86400
+    s3_client: boto3.client,
+    signed_url_expiry_secs: int=86400,
+    aws_region: str="us-east-1"
 ):
     """
     Generates a presigned url of the file stored in s3
     """
     # Note that the bucket and service(e.g. summarization) should run on the same aws region
     try:
-        s3_client = boto3.client(
-            "s3",
-            region_name=aws_region,
-            config=Config(
-                signature_version="s3v4",
-                s3={"addressing_style": "path"}
+        if not s3_client:
+            s3_client = boto3.client(
+                "s3",
+                region_name=aws_region,
+                config=Config(
+                    signature_version="s3v4",
+                    s3={"addressing_style": "path"}
+                )
             )
-        )
         url = s3_client.generate_presigned_url(
             ClientMethod="get_object",
             Params={
@@ -97,11 +99,13 @@ def generate_presigned_url(
     return url
 
 def upload_to_s3(
-    contents: Any,
+    contents: str,
     contents_type: str,
     bucket_name: str,
     key: str,
-    aws_region: str="us-east-1"
+    aws_region: str="us-east-1",
+    s3_client: Optional[boto3.client]=None,
+    signed_url_expiry_secs: int=86400
 ):
     """
     Stores the summary in s3 and generate presigned url
@@ -120,6 +124,8 @@ def upload_to_s3(
         return generate_presigned_url(
             bucket_name,
             key,
+            s3_client,
+            signed_url_expiry_secs=signed_url_expiry_secs,
             aws_region=aws_region
         )
     except ClientError as cexc:
