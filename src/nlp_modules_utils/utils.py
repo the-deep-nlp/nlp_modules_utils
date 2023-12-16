@@ -140,6 +140,7 @@ def send_request_on_callback(
     """
     Sends the results in a callback url
     """
+    logger.info("Sending the data to the callback url %s", callback_url)
     try:
         response = requests.post(
             callback_url,
@@ -147,10 +148,11 @@ def send_request_on_callback(
             data=json.dumps(response_data),
             timeout=30
         )
+        logger.info(f"Response HTTP status code is {response.status_code}")
     except requests.exceptions.RequestException as rexc:
         logger.error("Exception occurred while sending request %s", str(rexc))
         return None
-        
+
     if response.status_code == 200:
         logger.info("Successfully sent the request on callback url")
         return response
