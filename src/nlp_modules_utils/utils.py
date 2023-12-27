@@ -158,6 +158,13 @@ def send_request_on_callback(
         return response
     else:
         logger.error("Error while sending the request on callback url")
+        try:
+            logger.info(
+                "The response object is %s and the callback payload was %s",
+                json.dumps(response.json()),
+                json.dumps(response_data))
+        except AttributeError:
+            logger.info("The response object error message is not available.")
         return None
 
 def update_db_table_callback_retry(
