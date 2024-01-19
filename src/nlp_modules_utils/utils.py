@@ -188,6 +188,47 @@ def update_db_table_callback_retry(
         logger.error(f"Failed to update table {db_table} for callback retries. Some missing fields")
 
 
+def add_metric_data(
+    cw_client,
+    metric_name: str,
+    metric_value: float,
+    dimension_name: str,
+    dimension_value: str,
+    unit_type: str="None",
+    environment: str="staging",
+    namespace: str="OPENAI_BILLING"
+):
+    """ Add custom metric value to cloudwatch """
+    time_now = datetime.now()
+    metricdata = [
+        {
+            'MetricName': metric_name,
+            'Dimensions': [
+                {
+                    'Name': dimension_name,
+                    'Value': dimension_value
+                },
+                {
+                    'Name': 'Environment',
+                    'Value': environment
+                }
+            ],
+            'Timestamp': datetime.timestamp(time_now),
+            'Unit': unit_type,
+            'Value': metric_value
+        }
+    ]
+    try:
+        cw_client.put_metric_data(
+            MetricData = metricdata,
+            Namespace = namespace
+        )
+        logging.info(f"Successfully wrote for the metric {metric_name}={metric_value} to cloudwatch.")
+    except ClientError as cexc:
+        logging.error(f"Error occurred while writing metric value: {cexc}")
+
+
+
 class StateHandler(Enum):
     """
     List of categories to indicate the status of task
